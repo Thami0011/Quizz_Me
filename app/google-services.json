@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1041080176384",
+    "project_id": "culturequizapp-73961",
+    "storage_bucket": "culturequizapp-73961.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041080176384:android:79242dc379b77b3c742de5",
+        "android_client_info": {
+          "package_name": "com.example.quizme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz5_uQlwf05CiZzq-sf0wEeNeJmSyBfPA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
