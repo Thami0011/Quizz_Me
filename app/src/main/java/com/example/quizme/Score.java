@@ -1,6 +1,7 @@
 package com.example.quizme;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,5 +21,12 @@ public class Score extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Récupérer le score depuis l'intent
+        int score = getIntent().getIntExtra("score", 0);
+
+        // Afficher le score dans un TextView
+        TextView scoreTextView = findViewById(R.id.textViewScore);
+        scoreTextView.setText("Votre score : " + score);
     }
 }
