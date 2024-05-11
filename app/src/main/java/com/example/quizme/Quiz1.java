@@ -80,8 +80,8 @@ public class Quiz1 extends AppCompatActivity {
         next=findViewById(R.id.button1);
         rg=findViewById(R.id.rg);
         textViewCountdown = findViewById(R.id.textViewCountdown);
-        startCountdown(); // Démarre le compte à rebours
-        // Votre code existant...
+        startCountdown();
+
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,10 +104,10 @@ public class Quiz1 extends AppCompatActivity {
     }
 
     private void startCountdown() {
-        countDownTimer = new CountDownTimer(10000, 1000) { // 30 secondes, 1 seconde d'intervalle
+        countDownTimer = new CountDownTimer(10000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                // Mise à jour de l'affichage à chaque tick
+
                 long seconds = millisUntilFinished / 1000;
                 long minutes = seconds / 60;
                 long hours = minutes / 60;
@@ -120,9 +120,9 @@ public class Quiz1 extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                // Action à effectuer lorsque le compte à rebours est terminé
+
                 textViewCountdown.setText("Terminé!");
-                // Attendre 10 secondes avant de passer à la page suivante
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -131,17 +131,17 @@ public class Quiz1 extends AppCompatActivity {
                         startActivity(i1);
                         finish();
                     }
-                }, 1000); // 10 secondes
+                }, 1000);
             }
         };
-        countDownTimer.start(); // Démarre le compte à rebours
+        countDownTimer.start();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (countDownTimer != null) {
-            countDownTimer.cancel(); // Arrête le compte à rebours pour éviter les fuites de mémoire
+            countDownTimer.cancel();
         }
     }
 }

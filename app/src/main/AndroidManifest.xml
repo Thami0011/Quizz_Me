@@ -13,6 +13,9 @@
         android:theme="@style/My_Style"
         tools:targetApi="31">
         <activity
+            android:name=".ScoreBoard"
+            android:exported="false" />
+        <activity
             android:name=".Quiz6"
             android:exported="false" />
         <activity

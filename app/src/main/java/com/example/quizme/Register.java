@@ -21,9 +21,11 @@ import com.google.firebase.Firebase;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class Register extends AppCompatActivity {
-    EditText email, password, password1;
+    EditText email, password, password1, nameEditText;
     Button bregister;
 
     FirebaseAuth MyAuthentication;
@@ -41,6 +43,7 @@ public class Register extends AppCompatActivity {
         email = findViewById(R.id.RegisterEmailEditText);
         password = findViewById(R.id.RegisterPasswordEditText);
         password1 = findViewById(R.id.ConfirmPasswordEditText);
+        nameEditText = findViewById(R.id.NameEditText);
         bregister = findViewById(R.id.RegisterButton);
         MyAuthentication = FirebaseAuth.getInstance();
 
@@ -50,7 +53,8 @@ public class Register extends AppCompatActivity {
                 String mail = email.getText().toString();
                 String pass = password.getText().toString();
                 String pass1 = password1.getText().toString();
-                if(TextUtils.isEmpty(mail)||TextUtils.isEmpty(pass)||TextUtils.isEmpty(pass1)){
+                String userName = nameEditText.getText().toString();
+                if(TextUtils.isEmpty(mail)||TextUtils.isEmpty(pass)||TextUtils.isEmpty(pass1)||TextUtils.isEmpty(userName)){
                     Toast.makeText(Register.this, "Veuillez insérer les champs obligatoires", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -62,25 +66,41 @@ public class Register extends AppCompatActivity {
                     Toast.makeText(Register.this, "Vérification de password invalide", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                SignUp(mail,pass);
+                SignUp(mail,pass, userName);
             }
         });
     }
 
-    public void SignUp(String mail, String password){
+    public void SignUp(String mail, String password, String userName){
         MyAuthentication.createUserWithEmailAndPassword(mail, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()){
-                            Toast.makeText(Register.this, "Enregistrement réussi",Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(),MainActivity.class));
-                            finish();
+                            // User is successfully created, now update profile with name
+                            FirebaseUser user = MyAuthentication.getCurrentUser();
+                            if (user != null) {
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(userName)
+                                        .build();
+
+                                user.updateProfile(profileUpdates)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    // Profile updated successfully
+                                                    Toast.makeText(Register.this, "Enregistrement réussi",Toast.LENGTH_SHORT).show();
+                                                    startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                                                    finish();
+                                                }
+                                            }
+                                        });
+                            }
                         }else {
-                            Toast.makeText(Register.this, "Enregistrement réussi" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Register.this, "Enregistrement échoué: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
-
 }

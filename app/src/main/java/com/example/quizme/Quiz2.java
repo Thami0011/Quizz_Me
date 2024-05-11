@@ -12,11 +12,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Iterator;
 import java.util.Locale;
 
 public class Quiz2 extends AppCompatActivity {
@@ -24,9 +32,10 @@ public class Quiz2 extends AppCompatActivity {
     RadioGroup rg;
     RadioButton rb;
     int score;
-    String correctResponse = "GHANA";
+    String correctresponse;
     TextView textViewCountdown;
     CountDownTimer countDownTimer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,24 +50,71 @@ public class Quiz2 extends AppCompatActivity {
 
         next = findViewById(R.id.button);
         rg = findViewById(R.id.rg);
-        textViewCountdown = findViewById(R.id.textViewCountdown); // Assuming you have this TextView in your layout
+        textViewCountdown = findViewById(R.id.textViewCountdown);
 
         Intent i2 = getIntent();
         score = i2.getIntExtra("score", 0);
 
-        startCountdown(); // Start the countdown timer
+        startCountdown();
+
+        DatabaseReference questionsRef = FirebaseDatabase.getInstance().getReference().child("questions");
+        questionsRef.limitToFirst(2).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    if (dataSnapshot.getChildrenCount() >= 2)
+                    {
+
+                        Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                        iterator.next();
+                        DataSnapshot secondQuestionSnapshot = iterator.next();
+                        Question secondQuestion = secondQuestionSnapshot.getValue(Question.class);
+
+                        if (secondQuestion != null) {
+                            TextView questionTextView = findViewById(R.id.textView);
+                            RadioButton option1RadioButton = findViewById(R.id.radioButton);
+                            RadioButton option2RadioButton = findViewById(R.id.radioButton2);
+                            RadioButton option3RadioButton = findViewById(R.id.radioButton3);
+                            correctresponse = secondQuestionSnapshot.child("answer").getValue(String.class);
+
+                            questionTextView.setText(secondQuestion.getQuestion());
+                            option1RadioButton.setText(secondQuestion.getOption1());
+                            option2RadioButton.setText(secondQuestion.getOption2());
+                            option3RadioButton.setText(secondQuestion.getOption3());
+                        }
+                    } else {
+                        Toast.makeText(Quiz2.this, "Only one question found", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(Quiz2.this, "No questions found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(Quiz2.this, "Error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (rg.getCheckedRadioButtonId() == -1) {
-                    Toast.makeText(getApplicationContext(), "Veuillez choisir une réponse", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
                 } else {
-                    rb = findViewById(rg.getCheckedRadioButtonId());
-                    if (rb.getText().toString().equals(correctResponse)) score += 1;
-                    Intent i1 = new Intent(getApplicationContext(), Quiz3.class);
-                    i1.putExtra("score", score);
-                    startActivity(i1);
+                    int selectedRadioButtonId = rg.getCheckedRadioButtonId();
+                    rb = findViewById(selectedRadioButtonId);
+
+
+                    if(rb.getText().toString().equals(correctresponse)) {
+                        score += 1;
+                    }
+
+
+                    Intent i2 = new Intent(getApplicationContext(), Quiz3.class);
+                    i2.putExtra("score", score);
+                    startActivity(i2);
                     finish();
                 }
             }
@@ -69,7 +125,7 @@ public class Quiz2 extends AppCompatActivity {
         countDownTimer = new CountDownTimer(10000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                // Update the countdown display
+
                 long seconds = millisUntilFinished / 1000;
                 long minutes = seconds / 60;
                 long hours = minutes / 60;
@@ -83,7 +139,7 @@ public class Quiz2 extends AppCompatActivity {
             @Override
             public void onFinish() {
                 textViewCountdown.setText("Terminé!");
-                // Wait for 1 second before moving to the next page
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -92,17 +148,17 @@ public class Quiz2 extends AppCompatActivity {
                         startActivity(i1);
                         finish();
                     }
-                }, 1000); // 1 second
+                }, 1000);
             }
         };
-        countDownTimer.start(); // Start the countdown timer
+        countDownTimer.start();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (countDownTimer != null) {
-            countDownTimer.cancel(); // Stop the countdown timer to avoid memory leaks
+            countDownTimer.cancel();
         }
     }
 }

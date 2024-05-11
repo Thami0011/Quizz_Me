@@ -38,12 +38,19 @@
 
     <Button
         android:id="@+id/buttonLogout"
+        android:layout_width="127dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="32dp"
+        android:background="@color/colorPrimary"
+        android:text="Rejouer"
+        android:textSize="20dp" />
+
+    <Button
+        android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logout"
-        android:background="@color/colorPrimary"
-        android:textSize="20dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="32dp"/>
+        android:layout_gravity="center"
+        android:text="Voir historique" />
 
 </LinearLayout>
